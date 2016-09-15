@@ -1,0 +1,361 @@
+﻿
+
+<link href="~/js/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="~/js/DataTables-1.10.12/media/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+<script src="~/js/jquery-1.11.1.min.js"></script>
+
+<script src="~/js/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+<script src="~/js/DataTables-1.10.12/media/js/jquery.dataTables.min.js"></script>
+<script src="~/js/bootstrap-datepicker.js"></script>
+
+ <a href="#"  data-target="#myModal" id="ids">Listplayer</a> 
+
+<input type="checkbox" name="chks" id="chktxt"/>Active
+
+
+
+    <div class="col-sm-12">
+        <table id="sampletbles">
+               <thead> 
+                <tr>
+                <th>ID</th>
+                 <th>PLAYERNAME</th>
+                 <th>GENDER</th>
+                 <th>DOB</th>
+                    <th>STATUS</th>
+                    <th>EDIT</th>
+                     <th>DELETE</th>
+            </tr>
+</thead>
+            <tbody></tbody>
+  
+          
+        </table>
+    </div>
+
+
+<!-- Modal -->
+<div class="modal fade in" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="height:380px;">
+      <div class="modal-header">
+        
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body" style="height:260px;" >
+
+          <div class="col-sm-12">
+              <div class="row-fluid">
+                  <div class="span3">
+                      <label>PlayerName</label>
+                      <input type="text" id="txtplayernme" class="form-control" style="width:150px;" />
+                         <input type="hidden" id="txtplayernmeid" class="form-control" style="width:150px;" />
+                   </div>
+                  <br />
+                  <div class="span3">
+                       <label>DOB</label>
+                      <input type="text" id="txtdob" class="form-control" style="width:150px;" />
+                  </div>
+              </div>
+
+              <div class="row-fluid">
+                  <div class="span3">
+                      <label>Gender</label>
+                      <input type="radio" id="txtm" name="rds" value="0" />Male &nbsp; &nbsp; <input type="radio" id="txtf" name="rds" value="1" />Female
+                   </div>
+                     
+             @*     <div class="span3">
+                       <label>Rating</label>
+                      <input type="text" id="txtrating" class="form-control" style="width:150px;" />
+                  </div>*@
+              </div>
+               <div class="row-fluid">
+                  <div class="span3">
+                      <label>Status</label>
+                      <input type="checkbox" name='rdsc' id="txtstaus" value="1" />
+                   </div>
+                     
+         
+              </div>
+          </div>
+          
+    
+    </div>
+        <div class="modal-footer">
+            <input type="button" value="Save" id="txtsaves" class="btn btn-primary" /> &nbsp;  <input type="button" value="Update" id="txtupdate" class="btn btn-primary" /> &nbsp;  <input type="button" value="Clear" class="btn btn-danger" /> 
+        </div>
+  </div>
+</div>
+    </div>
+
+<script type="text/javascript">
+
+    var sampletble = $("#sampletbles").dataTable({
+
+        "bjqueryUI": true,
+        "sPaginationType": "full_numbers",
+        "aoColumns": [
+            { "bVisible":true },
+               { "bVisible": true },
+                  { "bVisible": true },
+                      { "bVisible": true },
+                     { "bVisible": true },
+                       { "bVisible": true },
+                      { "bVisible": true }
+        ],
+        "fnRowCallback": function (nRow , oData) {
+
+            if (oData[4] == "1") {
+
+                $('td', nRow).css('background-color', 'green');
+
+            }
+            else {
+
+                $('td', nRow).css('background-color', 'red');
+            }
+
+        }
+        
+    });
+
+    $("#ids").click(function () {
+      
+        $("#myModal").modal('show');
+
+    });
+
+    $("#txtsaves").click(function () {
+
+        var inserted = { "playername": "", "dob": "", "gender": "", "Status": "", "CreatedOn": "", "Createdby": "", };
+
+        inserted.playername = $("#txtplayernme").val();
+       // alert(inserted.playername);
+        inserted.dob = $("#txtdob").val();
+       // alert(inserted.dob);
+        inserted.gender = $("input[name='rds']:checked").val();
+        // alert(inserted.gender);
+
+        if ($("input[name='rdsc']").is(':checked')) {
+
+            inserted.Status = "1";
+        }
+        else {
+            inserted.Status = "0";
+        }
+
+       // inserted.Status = $("input[name='rdsc']:checked").val();
+       // alert(inserted.Status);
+        // alert('df');
+        inserted.CreatedOn = $("#txtdob").val();
+        inserted.Createdby = "rajiv";
+
+        $.ajax({
+
+            url: "/player/insertsample",
+            type: "Post",
+            dataType: "json",
+            data: JSON.stringify({ inserted: inserted }),
+            contentType:"application/json",
+            success: function (response) {
+                alert('saved');
+                window.location.href = "/player/Index";
+            }
+
+
+        });
+
+
+    });
+
+
+    $("#txtupdate").click(function () {
+
+        var inserted = {"Id":"", "playername": "", "dob": "", "gender": "", "Status": "", "CreatedOn": "", "Createdby": "", };
+
+
+        inserted.Id = $("#txtplayernmeid").val();
+        inserted.playername = $("#txtplayernme").val();     
+        inserted.dob = $("#txtdob").val();       
+        inserted.gender = $("input[name='rds']:checked").val();
+        inserted.Status = $("input[name='rdsc']:checked").val();
+        inserted.CreatedOn = $("#txtdob").val();
+        inserted.Createdby = "rajiv";
+
+
+        $.ajax({
+
+            url: "/player/updatesample",
+            type: "Post",
+            dataType: "json",
+            data: JSON.stringify({ inserted: inserted }),
+            contentType: "application/json",
+            success: function (response) {
+                alert('updated');
+                window.location.href = "/player/Index";
+            }
+
+
+        });
+
+
+    });
+
+
+
+    $("#txtdob").datepicker({
+
+        dateFormat:'dd/MM/yyyy'
+
+    });
+
+
+    $(document).ready(function () {
+
+
+        $.ajax({
+            url: "/player/datatable",
+            type: "POST",
+            asnyc: false,
+            dataType: "json",
+            contentType: "application/json",
+            data: {},
+            success: function (response) {
+
+                sampletble.fnClearTable(this);
+
+                for (var i = 0; i < response.result.length; i++) {
+
+                    sampletble.fnAddData([
+                         response.result[i].Id,
+                         response.result[i].playername,
+                           response.result[i].gender,
+                              response.result[i].dob,
+                         response.result[i].status,
+                          //response.result[i].createdby,
+                          //response.result[i].createdon,
+                          '<a href="#" id="txtedit">Edit</a>',
+                          '<a href="#" id="txtdel">Delete</a>'
+
+                    ])
+                }
+
+            }
+        });
+
+    });
+
+    $("#sampletbles tbody").on('click', '#txtedit', function (event) {
+
+
+        var ab = ($(this).closest('tr').find('td:eq(0)').text());
+
+        var abc = ($(this).closest('tr').find('td:eq(1)').text());
+
+        var abcd = ($(this).closest('tr').find('td:eq(2)').text());
+
+        var abcde = ($(this).closest('tr').find('td:eq(3)').text());
+
+        var abcdef = ($(this).closest('tr').find('td:eq(4)').text());
+
+
+        
+       $("#txtplayernmeid").val(ab);
+       $("#txtplayernme").val(abc);  
+        if (abcd == "0") {
+
+            $("input[name = 'rds']").prop('checked', true);
+
+        }
+        else {
+
+            $("input[name = 'rds']").prop('checked', true);
+        }
+        $("#txtdob").val(abcde);  
+        if (abcdef == "1") {
+
+            $("input[name = 'rdsc']").prop('checked' , true);
+
+        }
+        $("#myModal").modal('show');
+
+    });
+
+    $("#sampletbles tbody").on('click', '#txtdel', function (event) {
+
+       // var row = $(this).closest('tr').get(0);
+        var row = $(this).closest("tr").get(0);
+        sampletble.fnDeleteRow(sampletble.fnGetPosition(row));
+
+    });
+    
+    $("#chktxt").click(function () {
+
+        if ($("input[name='chks']").is(':checked')) {
+          
+            $.ajax({
+                url: "/player/datatableactive",
+                type: "POST",
+                asnyc: false,
+                dataType: "json",
+                contentType: "application/json",
+                data: {},
+                success: function (response) {
+
+                    sampletble.fnClearTable(this);
+
+                    for (var i = 0; i < response.result.length; i++) {
+
+                        sampletble.fnAddData([
+                             response.result[i].Id,
+                             response.result[i].playername,
+                               response.result[i].gender,
+                                  response.result[i].dob,
+                             response.result[i].status,
+                              //response.result[i].createdby,
+                              //response.result[i].createdon,
+                              '<a href="#" id="txtedit">Edit</a>',
+                                         '<a href="#" id="txtdel">Delete</a>'
+
+                        ])
+                    }
+
+                }
+            });
+        }
+        else {
+            $.ajax({
+                url: "/player/datatableinactive",
+                type: "POST",
+                asnyc: false,
+                dataType: "json",
+                contentType: "application/json",
+                data: {},
+                success: function (response) {
+
+                    sampletble.fnClearTable(this);
+
+                    for (var i = 0; i < response.result.length; i++) {
+
+                        sampletble.fnAddData([
+                             response.result[i].Id,
+                             response.result[i].playername,
+                               response.result[i].gender,
+                                  response.result[i].dob,
+                             response.result[i].status,
+                              //response.result[i].createdby,
+                              //response.result[i].createdon,
+                              '<a href="#" id="txtedit">Edit</a>',
+                                         '<a href="#" id="txtdel">Delete</a>'
+
+                        ])
+                    }
+
+                }
+            });
+        }
+    });
+
+</script>
+
